@@ -7,18 +7,17 @@ body {
     margin: 50px;
 }
 
-
 button {
     margin-top: auto;
     padding: 10px;
     font-size: 16px;
-    align-items:first baseline;
+    align-items: first baseline; /* Corrected typo: "align-items" should be "align-items:" */
 }
-.player-hand{
-    
 
-    
+.player-hand {
+    /* Add your styles for player hand here */
 }
+
 .card {
     width: 96px;
     height: 144px;
