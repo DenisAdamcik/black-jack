@@ -60,7 +60,7 @@ function startGame() {
 
    
 function drawCard(target) {
-    const card = deck.pop(); // Draw a card from the deck
+    const card = deck.pop(); 
     const cardImg = createCardImage("./cards/" + card + ".png");
     const value = getValue(card);
     const aceCount = checkAce(card);
@@ -68,7 +68,7 @@ function drawCard(target) {
     if (target === "dealer-cards") {
         dealerSum += value;
         dealerAceCount += aceCount;
-        reduceDealerAce(); // Reduce Aces for the dealer
+        reduceDealerAce();
     } else {
         yourSum += value;
         yourAceCount += aceCount;
