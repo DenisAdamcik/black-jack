@@ -19,8 +19,7 @@ body {
     width: 125px;
     margin: 5px;
     border: 1px solid #000;
-    border-radius: 8px; /* Add border-radius for rounded corners */
-}
+    border-radius: 8px; 
 
 #hit-button,
 #stand-button,
@@ -39,11 +38,11 @@ body {
 #hit-button:hover,
 #stand-button:hover,
 #deal-button:hover {
-    background-color: #0056b3; /* Darker shade on hover */
+    background-color: #0056b3; 
 }
 
 #results {
     font-size: 18px;
     margin-top: 20px;
-    color: #dc3545; /* Red color for results */
+    color: #dc3545;
 }
