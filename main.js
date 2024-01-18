@@ -57,7 +57,7 @@ function startGame() {
         yourAceCount += checkAce(card);
         document.getElementById("your-cards").append(cardImg);
     }
-
+}
    
 function drawCard(target) {
     const card = deck.pop(); 
