@@ -10,7 +10,7 @@ window.onload = function () {
     shuffleDeck();
     startGame();
 
-    // Add event listeners for the "Hit" and "Stay" buttons
+  
     document.getElementById("hit").addEventListener("click", hit);
     document.getElementById("stay").addEventListener("click", stay);
     document.getElementById("deal").addEventListener("click", deal);
@@ -47,7 +47,7 @@ function startGame() {
         dealerAceCount += checkAce(card);
         document.getElementById("dealer-cards").append(cardImg);
     }
-   // document.getElementById("dealer-sum").innerText = dealerSum;
+  
 
     for (let i = 0; i < 2; i++) {
         let cardImg = document.createElement("img");
@@ -58,8 +58,7 @@ function startGame() {
         document.getElementById("your-cards").append(cardImg);
     }
 
-    //document.getElementById("your-sum").innerText = yourSum;
-}
+   
 function drawCard(target) {
     const card = deck.pop(); // Draw a card from the deck
     const cardImg = createCardImage("./cards/" + card + ".png");
@@ -74,8 +73,7 @@ function drawCard(target) {
         yourSum += value;
         yourAceCount += aceCount;
 
-        // If the drawn card is an Ace and adding 11 would exceed 21,
-        // treat the Ace as 1 for each previous Ace that was counted as 11.
+      
         while (yourSum > 21 && yourAceCount > 0) {
             yourSum -= 10;
             yourAceCount -= 1;
@@ -84,7 +82,7 @@ function drawCard(target) {
 
     document.getElementById(target).append(cardImg);
 
-    // Update scores after appending the card
+ 
     updateScores();
 }
 
@@ -99,7 +97,7 @@ function hit() {
 
     drawCard("your-cards");
 
-    // Moved the calculation of value and aceCount inside the hit function
+
     const card = document.getElementById("your-cards").lastChild;
     const value = getValue(card.src)-10;
     const aceCount = checkAce(card.src);
@@ -117,7 +115,7 @@ function hit() {
 
 
 function stay() {
-    reduceDealerAce(); // Reduce Aces for the dealer
+    reduceDealerAce();
 
     canHit = false;
 
@@ -127,7 +125,7 @@ function stay() {
         cardImg.src = "./cards/" + card + ".png";
         dealerSum += getValue(card);
         dealerAceCount += checkAce(card);
-        reduceDealerAce(); // Reduce Aces for the dealer
+        reduceDealerAce(); 
         document.getElementById("dealer-cards").append(cardImg);
     }
 
@@ -157,7 +155,7 @@ function deal() {
 
     document.getElementById("dealer-cards").innerHTML = "";
     document.getElementById("your-cards").innerHTML = "";
-
+    document.getElementById("results").innerText = "";
     startGame();
     updateScores();
 }
@@ -170,10 +168,10 @@ function revealDealerCards() {
 }
 
 function getValue(card) {
-    let data = card.split("-"); // "4-C" -> ["4", "C"]
+    let data = card.split("-");
     let value = data[0];
 
-    if (isNaN(value)) { //A J Q K
+    if (isNaN(value)) { 
         if (value == "A") {
             return 11;
         }
