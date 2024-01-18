@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     text-align: center;
 }
 
@@ -7,29 +7,43 @@ body {
     margin: 50px;
 }
 
-button {
-    margin-top: auto;
-    padding: 10px;
-    font-size: 16px;
-    align-items: first baseline; /* Corrected typo: "align-items" should be "align-items:" */
+#dealer-cards,
+#your-cards {
+    display: flex;
+    justify-content: center;
 }
 
-.player-hand {
-    /* Add your styles for player hand here */
-}
-
-.card {
-    width: 96px;
-    height: 144px;
+#dealer-cards img,
+#your-cards img {
+    height: 175px;
+    width: 125px;
     margin: 5px;
     border: 1px solid #000;
-    background-color: #fff;
-    display: inline-block;
-    text-align: center;
-    line-height: 80px;
+    border-radius: 8px; /* Add border-radius for rounded corners */
 }
 
-#result {
+#hit-button,
+#stand-button,
+#deal-button {
+    width: 100px;
+    height: 50px;
+    font-size: 16px;
+    margin: 10px;
+    border: none;
+    background-color: #007BFF;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#hit-button:hover,
+#stand-button:hover,
+#deal-button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+#results {
     font-size: 18px;
     margin-top: 20px;
+    color: #dc3545; /* Red color for results */
 }

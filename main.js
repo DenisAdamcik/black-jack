@@ -1,109 +1,214 @@
-function getRandomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+let dealerSum = 0;
+let yourSum = 0;
+let dealerAceCount = 0;
+let yourAceCount = 0;
+let deck;
+let canHit = true;
 
-const maxCards = 52;
-let drawnCards = [];
+window.onload = function () {
+    buildDeck();
+    shuffleDeck();
+    startGame();
 
-const imagePath = "./PlayingCards/";
+    // Add event listeners for the "Hit" and "Stay" buttons
+    document.getElementById("hit").addEventListener("click", hit);
+    document.getElementById("stay").addEventListener("click", stay);
+    document.getElementById("deal").addEventListener("click", deal);
 
-function displayCardUnderHand(cardNumber, handId) {
-    const imageUrl = imagePath + cardNumber + ".png";
-    const cardElement = document.createElement('div');
-    cardElement.className = 'card';
-    cardElement.style.backgroundImage = `url(${imageUrl})`;
-    document.getElementById(handId).appendChild(cardElement);
-}
+};
 
-function hit(handId) {
-    let newRandomCard;
+function buildDeck() {
+    let values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+    let types = ["C", "D", "H", "S"];
+    deck = [];
 
-    do {
-        newRandomCard = getRandomNumber(1, maxCards);
-    } while (drawnCards.includes(newRandomCard));
-
-    drawnCards.push(newRandomCard);
-    displayCardUnderHand(newRandomCard, handId);
-
-    if (drawnCards.length === maxCards) {
-        drawnCards = [];
+    for (let i = 0; i < types.length; i++) {
+        for (let j = 0; j < values.length; j++) {
+            deck.push(values[j] + "-" + types[i]);
+        }
     }
 }
 
-function deal() {
-    document.getElementById('deal-button').disabled = true;
-
-    hit('player-hand');
-    hit('dealer-hand');
-    hit('player-hand');
-    hit('dealer-hand');
-
-    document.getElementById('hit-button').disabled = false;
+function shuffleDeck() {
+    for (let i = 0; i < deck.length; i++) {
+        let j = Math.floor(Math.random() * deck.length);
+        let temp = deck[i];
+        deck[i] = deck[j];
+        deck[j] = temp;
+    }
 }
 
-function dealerTurn() {
-    // Dealer hits until the hand is at least 17 or the dealer's hand beats the player's hand
-    while (calculateHandValue('dealer-hand') < 17 || calculateHandValue('player-hand') < calculateHandValue('dealer-hand')) {
-        hit('dealer-hand');
+function startGame() {
+    for (let i = 0; i < 2; i++) {
+        let cardImg = document.createElement("img");
+        let card = deck.pop();
+        cardImg.src = "./cards/" + card + ".png";
+        dealerSum += getValue(card);
+        dealerAceCount += checkAce(card);
+        document.getElementById("dealer-cards").append(cardImg);
+    }
+   // document.getElementById("dealer-sum").innerText = dealerSum;
+
+    for (let i = 0; i < 2; i++) {
+        let cardImg = document.createElement("img");
+        let card = deck.pop();
+        cardImg.src = "./cards/" + card + ".png";
+        yourSum += getValue(card);
+        yourAceCount += checkAce(card);
+        document.getElementById("your-cards").append(cardImg);
     }
 
-    determineWinner();
+    //document.getElementById("your-sum").innerText = yourSum;
 }
+function drawCard(target) {
+    const card = deck.pop(); // Draw a card from the deck
+    const cardImg = createCardImage("./cards/" + card + ".png");
+    const value = getValue(card);
+    const aceCount = checkAce(card);
 
-function calculateHandValue(handId) {
-    const handElements = document.getElementById(handId).getElementsByClassName('card');
-    let handValue = 0;
-    let numAces = 0;
+    if (target === "dealer-cards") {
+        dealerSum += value;
+        dealerAceCount += aceCount;
+        reduceDealerAce(); // Reduce Aces for the dealer
+    } else {
+        yourSum += value;
+        yourAceCount += aceCount;
 
-    for (let i = 0; i < handElements.length; i++) {
-        const imageUrl = handElements[i].style.backgroundImage;
-        const cardNumber = parseInt(imageUrl.match(/\d+/)[0]);
-
-        if (cardNumber >= 2 && cardNumber <= 10) {
-            handValue += cardNumber;
-        } else if (cardNumber >= 11 && cardNumber <= 13) {
-            handValue += 10; // Face cards value as 10
-        } else if (cardNumber === 1) {
-            handValue += 11; // Ace initially counts as 11
-            numAces += 1;
+        // If the drawn card is an Ace and adding 11 would exceed 21,
+        // treat the Ace as 1 for each previous Ace that was counted as 11.
+        while (yourSum > 21 && yourAceCount > 0) {
+            yourSum -= 10;
+            yourAceCount -= 1;
         }
     }
 
-    // Adjust Ace value from 11 to 1 if needed
-    while (handValue > 21 && numAces > 0) {
-        handValue -= 10;
-        numAces -= 1;
-    }
+    document.getElementById(target).append(cardImg);
 
-    return handValue;
+    // Update scores after appending the card
+    updateScores();
 }
 
-const winnerDisplay = document.createElement('div');
-document.body.appendChild(winnerDisplay);
 
-function determineWinner() {
-    const playerHandValue = calculateHandValue('player-hand');
-    const dealerHandValue = calculateHandValue('dealer-hand');
 
-    if (playerHandValue > 21 || (dealerHandValue <= 21 && dealerHandValue > playerHandValue)) {
-        winnerDisplay.textContent = 'Dealer wins!';
-    } else if (dealerHandValue > 21 || (playerHandValue <= 21 && playerHandValue > dealerHandValue)) {
-        winnerDisplay.textContent = 'Player wins!';
-    } else {
-        winnerDisplay.textContent = 'It\'s a tie!';
+
+
+function hit() {
+    if (!canHit) {
+        return;
     }
 
-    document.getElementById('deal-button').disabled = false;
+    drawCard("your-cards");
+
+    // Moved the calculation of value and aceCount inside the hit function
+    const card = document.getElementById("your-cards").lastChild;
+    const value = getValue(card.src)-10;
+    const aceCount = checkAce(card.src);
+
+    yourSum += value;
+    yourAceCount += aceCount;
+
+    if (reduceAce(yourSum, yourAceCount) > 21) {
+        canHit = false;
+        stay();
+    }
+
+    updateScores();
 }
 
-document.getElementById('deal-button').addEventListener('click', deal);
-document.getElementById('hit-button').addEventListener('click', function () {
-    hit('player-hand');
-    if (calculateHandValue('player-hand') > 21) {
-        alert('Player busts! Dealer wins.');
-        document.getElementById('deal-button').disabled = false;
-        document.getElementById('hit-button').disabled = true;
-    } else {
-        dealerTurn();
+
+function stay() {
+    reduceDealerAce(); // Reduce Aces for the dealer
+
+    canHit = false;
+
+    while (dealerSum < 17) {
+        let cardImg = document.createElement("img");
+        let card = deck.pop();
+        cardImg.src = "./cards/" + card + ".png";
+        dealerSum += getValue(card);
+        dealerAceCount += checkAce(card);
+        reduceDealerAce(); // Reduce Aces for the dealer
+        document.getElementById("dealer-cards").append(cardImg);
     }
-});
+
+    let message = "";
+    if (yourSum > 21) {
+        message = "You Lose!";
+    } else if (dealerSum > 21) {
+        message = "You win!";
+    } else if (yourSum == dealerSum) {
+        message = "Tie!";
+    } else if (yourSum > dealerSum) {
+        message = "You Win!";
+    } else if (yourSum < dealerSum) {
+        message = "You Lose!";
+    }
+
+    document.getElementById("dealer-sum").innerText = dealerSum;
+    document.getElementById("your-sum").innerText = yourSum;
+    document.getElementById("results").innerText = message;
+}
+function deal() {
+    dealerSum = 0;
+    yourSum = 0;
+    dealerAceCount = 0;
+    yourAceCount = 0;
+    canHit = true;
+
+    document.getElementById("dealer-cards").innerHTML = "";
+    document.getElementById("your-cards").innerHTML = "";
+
+    startGame();
+    updateScores();
+}
+
+function revealDealerCards() {
+    const dealerCards = document.getElementById("dealer-cards").getElementsByTagName("img");
+    for (let i = 0; i < dealerCards.length; i++) {
+        dealerCards[i].style.visibility = "visible";
+    }
+}
+
+function getValue(card) {
+    let data = card.split("-"); // "4-C" -> ["4", "C"]
+    let value = data[0];
+
+    if (isNaN(value)) { //A J Q K
+        if (value == "A") {
+            return 11;
+        }
+        return 10;
+    }
+    return parseInt(value);
+}
+
+function checkAce(card) {
+    if (card[0] == "A") {
+        return 1;
+    }
+    return 0;
+}
+
+function reduceAce(playerSum, playerAceCount) {
+    while (playerSum > 21 && playerAceCount > 0) {
+        playerSum -= 10;
+        playerAceCount -= 1;
+    }
+    return playerSum;
+}
+function reduceDealerAce() {
+    while (dealerSum > 21 && dealerAceCount > 0) {
+        dealerSum -= 10;
+        dealerAceCount -= 1;
+    }
+}
+
+function createCardImage(src) {
+    const cardImg = document.createElement("img");
+    cardImg.src = src;
+    return cardImg;
+}
+function updateScores() {
+    document.getElementById("dealer-sum").innerText = dealerSum;
+    document.getElementById("your-sum").innerText = yourSum;
+}
