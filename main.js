@@ -88,7 +88,7 @@ function hit() {
     drawCard("your-cards");
 
     const card = document.getElementById("your-cards").lastChild;
-    const value = getValue(card.src);
+    const value = getValue(card.src)-10;
     const aceCount = checkAce(card.src);
 
     yourSum += value;
