@@ -4,17 +4,18 @@ let dealerAceCount = 0;
 let yourAceCount = 0;
 let deck;
 let canHit = true;
-
+//Po spusteni stranky se nactou funkce a tlačitka
 window.onload = function () {
     buildDeck();
     shuffleDeck();
     startGame();
-
+    updateScores();
+    blackJack();
     document.getElementById("hit").addEventListener("click", hit);
     document.getElementById("stay").addEventListener("click", stay);
     document.getElementById("deal").addEventListener("click", deal);
 };
-
+//spoji hodnoty karet a typy karet do formatu cislo-typ
 function buildDeck() {
     let values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
     let types = ["C", "D", "H", "S"];
@@ -26,7 +27,7 @@ function buildDeck() {
         }
     }
 }
-
+//nahodne promicha karty
 function shuffleDeck() {
     for (let i = 0; i < deck.length; i++) {
         let j = Math.floor(Math.random() * deck.length);
@@ -35,7 +36,7 @@ function shuffleDeck() {
         deck[j] = temp;
     }
 }
-
+//razda 2 karty dealerovi 2 karty a hraci 2 karty
 function startGame() {
     for (let i = 0; i < 2; i++) {
         let cardImg = document.createElement("img");
@@ -55,7 +56,7 @@ function startGame() {
         document.getElementById("your-cards").append(cardImg);
     }
 }
-
+//vybere prvni kartu v balicku a vytvoři kartu a zaroven skontroluje jestly je to eso 
 function drawCard(target) {
     const card = deck.pop();
     const cardImg = createCardImage("./cards/" + card + ".png");
@@ -79,7 +80,7 @@ function drawCard(target) {
     document.getElementById(target).append(cardImg);
     updateScores();
 }
-
+//funkce pro hrace kdyz chce pridat kartu, ale kdyz hodnota karet prekroci 21 zastavi ho to a umožni dealerovy hrat
 function hit() {
     if (!canHit) {
         return;
@@ -101,7 +102,7 @@ function hit() {
 
     updateScores();
 }
-
+//hrac je spokojen s jeho karty a nechava hrat dealera 
 function stay() {
     reduceDealerAce();
     canHit = false;
@@ -115,13 +116,13 @@ function stay() {
         reduceDealerAce();
         document.getElementById("dealer-cards").append(cardImg);
     }
-
+// vyhodnoceni hry a nadefinovani promene pro text
     let message = "";
     if (yourSum > 21) {
         message = "You Lose!";
     } else if (dealerSum > 21) {
         message = "You win!";
-    } else if (yourSum == dealerSum) {
+    } else if (yourSum == dealerSum ) {
         message = "Tie!";
     } else if (yourSum > dealerSum) {
         message = "You Win!";
@@ -133,7 +134,14 @@ function stay() {
     document.getElementById("your-sum").innerText = yourSum;
     document.getElementById("results").innerText = message;
 }
-
+//kotroluje zda hrac ma blackjack na zacatku hry
+function blackJack(){
+    if(yourSum==21){
+        stay();
+        document.getElementById("blackjack").innerText = "BlackJack";
+    }
+}
+//resetuje promene a zacne hru od zacatku
 function deal() {
     dealerSum = 0;
     yourSum = 0;
@@ -148,13 +156,14 @@ function deal() {
     updateScores();
 }
 
-function revealDealerCards() {
+/*function revealDealerCards() {
     const dealerCards = document.getElementById("dealer-cards").getElementsByTagName("img");
     for (let i = 0; i < dealerCards.length; i++) {
         dealerCards[i].style.visibility = "visible";
     }
 }
-
+*/
+// rozdeli jmeno carty na hodnotu a typ, kdyz karta neni cislo se rovná 10 nebo 11
 function getValue(card) {
     let data = card.split("-");
     let value = data[0];
