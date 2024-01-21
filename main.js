@@ -152,9 +152,18 @@ function deal() {
     document.getElementById("dealer-cards").innerHTML = "";
     document.getElementById("your-cards").innerHTML = "";
     document.getElementById("results").innerText = "";
+
+    // Check if there are fewer than 10 cards remaining in the deck
+    if (deck.length < 10) {
+        // If so, reshuffle the deck
+        buildDeck();
+        shuffleDeck();
+    }
+
     startGame();
     updateScores();
 }
+
 
 /*function revealDealerCards() {
     const dealerCards = document.getElementById("dealer-cards").getElementsByTagName("img");
